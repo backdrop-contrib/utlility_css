@@ -1,0 +1,105 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function utility_css_menu() {
+  $items['utility-css/get'] = array(
+    'title' => 'Get CSS Classes from active theme',
+    'page callback' => '_utility_css_get',
+    'delivery callback' => 'backdrop_json_deliver',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+// Helper function to concatenate the autocomplete result with the classes already added
+function _utility_css_concat_result($classes, $match, $match_tag = false) {
+  $result = '';
+  if ($match_tag) {
+    $match = '<' . $match_tag . '>' . $match . '</' . $match_tag . '>';
+  }
+  if ($classes) {
+    for ($i = 0; $i < count($classes) - 1; $i++) {
+      $result .= $classes[$i] . ' ';
+    }
+    $result .= $match;
+    return $result;
+  }
+  else {
+    return $match;
+  }
+}
+
+/**
+ * Custom function to return css classes that match a string
+ */
+function _utility_css_get($search = '', $group = '') {
+  $matches = array();
+  $theme = config_get('system.core', 'theme_default');
+  $utility_css = false;
+
+  if ($theme_path = backdrop_get_path('theme', $theme)) {
+    if (strpos($theme_path, 'core/themes/basis') !== false) {
+      $utility_css['font']= array(
+        'color-inverse',
+        'font-size-xxxxlarge',
+        'font-size-xxxlarge',
+        'font-size-xxlarge',
+        'font-size-xlarge',
+        'font-size-large',
+        'font-size-medium',
+        'font-size-normal',
+        'font-size-small',
+        'font-size-xsmall',
+        'font-weight-bold',
+        'font-weight-normal',
+        'font-weight-normal',
+        'font-style-italic',
+        'font-style-normal',
+      );
+    }
+    else {
+      $info = system_get_info('theme', $theme);
+      $classes = FALSE;
+
+      $utility_css = $info['utility_css'];
+    }
+
+    if (strpos($search, ' ') !== FALSE) {
+      $classes = explode(' ', $search);
+      $search = end($classes);
+    }
+
+    if ($utility_css && $search) {
+      foreach ($utility_css as $key => $value) {
+        // Is this a group, and is it a group we're searching in
+        if (is_array($value) && $group == '' || strpos($group, $key) !== FALSE) {
+          foreach ($value as $value2) {
+            if (is_string($value2) && strpos($value2, $search) !== FALSE) {
+              $matches[_utility_css_concat_result($classes, $value2)] = _utility_css_concat_result($classes, $value2, 'strong');
+            }
+          }
+        }
+        elseif (is_string($value) && strpos($value, $search) !== FALSE) {
+          $matches[_utility_css_concat_result($classes, $value)] = _utility_css_concat_result($classes, $value, 'strong');
+        }
+      }
+    }
+  }
+
+  return $matches;
+}
+
+/**
+ * Implements hook_form_FORMID_alter().
+ */
+function utility_css_form_layout_block_configure_form_alter(&$form) {
+  $fields_for_autocomplete = array('classes', 'title_classes', 'content_classes');
+  foreach ($fields_for_autocomplete as $field_for_autocomplete) {
+    if (isset($form['style']['style_settings'][$field_for_autocomplete])) {
+      $form['style']['style_settings'][$field_for_autocomplete]['#autocomplete_path'] = 'utility-css/get';
+    }
+  }
+}

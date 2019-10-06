@@ -1,0 +1,5 @@
+name = Utility CSS
+description = Provides an autocomplete on CSS class fields for utility-classes
+package = Layout
+backdrop = 1.x
+type = module
