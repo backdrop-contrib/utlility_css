@@ -5,7 +5,7 @@ This module adds autocomplete to class fields in block configuration by searchin
 
 This is currently a proof of concept.
 
-![Screenshot of utility class module suggesting classes in block configuration](utility-class.png)
+![Screenshot of utility class module suggesting classes in block configuration](https://github.com/backdrop-contrib/utlility_css/raw/master/utility-class.png)
 
 This functionality works with Basis out of the box, or add config like the following to your theme's .info file:
 
