@@ -36,6 +36,7 @@ Roadmap
 Want to add the following features:
 
 * Have different predefined groups for classes, e.g. font, layout, spacing, background, etc.
+* Add text field widget so custom fields can use this functionality
 * Show good groups in different contexts
 * Maybe have some classes that are exclusive (e.g. you shouldn't be able to add font-weight-bold font-weight-normal on the same thing)
 * Provide a stylesheet with a lot of utilities that can be loaded in over any theme
